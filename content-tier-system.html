@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Tier System — Instrument · ServiceNow</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #080D14; padding-top: 44px; }
+
+    :root{
+      --teal:#00C7B1;
+      --font:'Inter',-apple-system,sans-serif;
+    }
+    .eyebrow{
+      font-size:11px;font-weight:700;letter-spacing:.14em;
+      text-transform:uppercase;color:var(--teal);
+      display:flex;align-items:center;gap:8px;margin-bottom:14px;
+    }
+    .eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--teal)}
+    h1.hero-title{
+      font-size:clamp(36px,5vw,60px);font-weight:900;
+      letter-spacing:-.03em;line-height:1.05;
+      margin-bottom:24px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cross-Page Navigation -->
+<nav class="x-nav">
+  <div class="x-nav-brand">Instrument <span class="x-nav-sep">·</span> <span class="x-nav-client">ServiceNow</span></div>
+  <div class="x-nav-links">
+    <a href="servicenow-ux-audit.html" class="x-nav-link">UX Audit</a>
+    <a href="servicenow-ia-vision.html" class="x-nav-link">IA Vision</a>
+    <a href="content-tier-system.html" class="x-nav-link x-active">Content Tiers</a>
+  </div>
+</nav>
+
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+
+
+// ─────────────────────────────────────────────
+// TIER DEFINITIONS
+// ─────────────────────────────────────────────
+const TIERS = [
+  {
+    id: 1, label: "T1", name: "Platform Moment",
+    tagline: "Brand · Vision · Provocation",
+    altitude: "50,000 ft",
+    color: "#62D84E", rgb: "98,216,78",
+    description: "Pure positioning — no product names, no feature claims. Think of it as the movie trailer: it makes you feel something before it explains anything. A T1 moment is 5–15 words that declare what ServiceNow is and why it exists. Start with tension, not product. Speak in outcomes — clarity, speed, confidence, alignment — not features. Compress complexity into a single, resonant truth. This is the reason someone pauses.",
+    whenUse: ["Homepage hero — above the fold only", "Event keynote opening statements", "Brand campaign headlines and OOH", "Document or report cover headlines"],
+    whenNot: ["Product or feature pages", "Below-fold body content on any page", "Any context where a product name is needed"],
+    examples: [
+      '"AI That Thinks. Workflows That Act."',
+      '"Put AI to Work for People."',
+      '"The Operating System for Enterprise AI Agents."',
+    ],
+    voiceNote: "Declarative. No hedging. Meaning + momentum. If it contains 'helps' or 'enables' it's T2, not T1. T1 sets the emotional and strategic context — it positions ServiceNow as the guide, not the product — and makes the visitor feel seen and understood before a single feature is named. It doesn't explain. It provokes.",
+  },
+  {
+    id: 2, label: "T2", name: "Platform Narrative",
+    tagline: "Context · Argument · Architecture",
+    altitude: "30,000 ft",
+    color: "#00C7B1", rgb: "0,199,177",
+    description: "The 'why this matters' layer. T2 sets the emotional and strategic context — it makes the visitor feel understood before it makes them informed. The target feeling is 'This gets me.' T2 establishes why the platform approach is categorically different without product specifics, compressing a complex landscape into a clear, resonant insight. It's the argument a thoughtful executive makes in the first 3 minutes of a pitch: big idea, simple language, no jargon.",
+    whenUse: ["Second section of Homepage (below hero)", "Platform Hub opening narrative", "Intro paragraphs on major hub pages", "Executive brief sections and thought leadership"],
+    whenNot: ["Feature detail or product spec sections", "Use case and proof sections", "Developer technical content"],
+    examples: [
+      '"AI without workflows is just expensive advice. AI inside workflows is autonomous enterprise execution."',
+      '"Intelligence has outpaced execution. The models can think. The open question is what makes them act safely, at scale, with context."',
+      '"The average enterprise runs 367+ applications. AI can only execute as well as the infrastructure beneath it allows."',
+    ],
+    voiceNote: "Uses analogy and contrast. GPS vs. air traffic control. The goal is to make the buyer feel seen — to name the tension they already feel but haven't articulated. Shows the competitive gap without naming competitors. Earns attention before asking for it.",
+  },
+  {
+    id: 3, label: "T3", name: "Capability Statement",
+    tagline: "Domains · Outcomes · Audiences",
+    altitude: "10,000 ft",
+    color: "#3B8BEB", rgb: "59,139,235",
+    description: "Names what the platform does at a domain or role level. This is where the goal shifts from sparking interest to building confidence — from emotional to specific. The target feeling is 'This works for me.' T3 connects platform capability to a specific audience or business problem, organized around real problems rather than product categories. Help the buyer see how it fits their environment. Remove doubt by translating vision into real capability. Products may be named but are framed as outcomes, not features.",
+    whenUse: ["Solutions and capability hub intro sections", "Product category landing pages", "Persona route cards ('For IT Leaders')", "Feature area overviews and intro paragraphs"],
+    whenNot: ["Homepage hero", "Pure brand or narrative moments", "Deep technical documentation and API content"],
+    examples: [
+      '"Now Assist resolves IT incidents autonomously — from detection to resolution — before a ticket ever gets opened."',
+      '"For CHROs: From onboarding to performance reviews, HR operations that took days happen in minutes — automatically."',
+      '"ServiceNow CRM connects front, middle, and back office on one platform — so every customer interaction drives a workflow, not just a record."',
+    ],
+    voiceNote: "Outcome-first. The user feeling here is 'This works for me' — not 'this sounds impressive.' Organize around the real problem the buyer is living with, then show the capability that resolves it. Names the job to be done, then the tool that does it. Products are outcomes here, not features.",
+  },
+  {
+    id: 4, label: "T4", name: "Proof & Use Case",
+    tagline: "Data · Customers · Reality",
+    altitude: "5,000 ft",
+    color: "#F59E0B", rgb: "245,158,11",
+    description: "The evidence layer — but evidence that moves, not just proves. T4 shows the platform working in the real world through transformation narratives, not just stats. Frame stories as company transformations: Before → After, tension → resolution. Make an employee the hero, not the logo. Use role-based POV — the IT leader fixing outages at 2am, the HR team onboarding 50 new employees. Make the invisible visible: wasted time, duplicate effort, the work that no one saw until it stopped happening. The best T4 content doesn't just prove the platform works — it makes the reader want the same result.",
+    whenUse: ["Customer proof strips on any page", "ROI calculators and business case tools", "Case study summary modules and callouts", "'What this looks like in practice' scenario sections", "Solutions page outcome data"],
+    whenNot: ["Hero sections", "Platform architecture and narrative intros", "Technical reference and documentation content"],
+    examples: [
+      '"AstraZeneca had a backlog no team could outrun. Now they\'ve reclaimed 30,000 hours a year — not because they hired more people, but because the work runs itself."',
+      '"An HR coordinator used to spend her Fridays chasing approvals across five systems. Now onboarding 50 new employees takes the same effort as onboarding five."',
+      '"They had 10 disconnected systems and everyone thought that was just the way things worked. Bell automated 90% of dispatch tasks. Pure Storage cut case resolution time by 7x. The invisible work disappeared."',
+    ],
+    voiceNote: "Specificity is credibility — but specificity alone isn't enough. Use truth as the tension: 'They had 10 disconnected systems and everyone thought that was just the way things worked.' Mini stories beat long case studies. Role-based POV beats company-level summaries. Group stories by theme — 'from reactive to predictive,' 'from manual to automated' — so the reader identifies before they evaluate. Real names + real moments + real transformation = proof that creates desire, not just belief.",
+  },
+  {
+    id: 5, label: "T5", name: "Feature & Function",
+    tagline: "Mechanics · Behavior · Evaluation",
+    altitude: "1,000 ft",
+    color: "#9B72F0", rgb: "155,114,240",
+    description: "Specific product features and interaction details for active evaluators. T5 explains how a capability works — the mechanics, the UI patterns, the configuration options — for someone already interested and assessing fit. This is where technical and UX credibility is built.",
+    whenUse: ["Product feature pages", "Feature comparison tables and evaluation guides", "'How it works' sections within product pages", "Demo scripts and interactive walkthroughs"],
+    whenNot: ["Homepage or solutions hub intros", "Brand and narrative moments", "Developer sandbox and API reference pages"],
+    examples: [
+      '"AI Control Tower enforces permissions below the model. Every agent action is logged: who initiated, what changed, who approved, SLA compliance, complete audit trail."',
+      '"Agent Orchestrator decomposes complex workflows into parallel workstreams, coordinates multiple Now Assist agents, and reassembles results with configurable human review gates."',
+      '"App Engine Studio: drag-and-drop workflow builder with pre-built components for approvals, escalations, SLA enforcement, and cross-department routing."',
+    ],
+    voiceNote: "Show, don't just tell. UI moments, step-by-step flows, before/after states. Layer depth: the top layer is a simple explanation, the middle layer is capability breakdown, the deep layer is technical detail. The buyer is actively evaluating fit — help them see exactly how it works in their environment. Technical precision without jargon overload. Explains mechanism, not just outcome.",
+  },
+  {
+    id: 6, label: "T6", name: "Technical Reference",
+    tagline: "Specs · Code · Sandbox",
+    altitude: "Ground",
+    color: "#64748B", rgb: "100,116,139",
+    description: "The implementation layer. T6 is for builders, admins, and technical evaluators who are past concept and into construction. API docs, code samples, sandbox environments, release notes, configuration guides. T6 builds developer trust through completeness and precision.",
+    whenUse: ["Developer Hub — API reference, code samples", "Free Sandbox environment and setup guides", "Release notes and changelogs", "Integration setup and admin configuration docs"],
+    whenNot: ["Any page where a non-technical buyer is the primary audience", "Homepage or executive solutions pages", "Brand, narrative, or proof sections"],
+    examples: [
+      "REST API endpoint documentation with cURL and JavaScript examples — Postman collection download included",
+      "Free Sandbox: pre-configured instance with ITSM, HR, and CRM demo data — activated in 60 seconds with email only, no credit card",
+      "App Engine: step-by-step workflow creation with code snippets for custom scripting, approval logic, and integration hooks — full CI/CD pipeline documentation",
+    ],
+    voiceNote: "Accuracy over elegance. Developers forgive plain writing. They do not forgive incorrect or incomplete technical information.",
+  },
+];
+
+const MIXING_RULES = [
+  { rule: "Always descend, never ascend", detail: "Pages move from higher tiers to lower as the user scrolls. A T4 proof section should never appear above a T2 narrative on the same page." },
+  { rule: "No page spans more than 4 tiers", detail: "Homepage spans T1–T4. Product pages span T3–T6. More than 4 tiers in a single page signals unclear audience targeting or mixed page purpose." },
+  { rule: "T1 is homepage-only by default", detail: "A T1 moment requires total context removal. Product and solutions pages open at T3 — they assume the buyer already has T1 context from prior navigation." },
+  { rule: "Every page needs at least one T4", detail: "Even the most technical product pages need a proof anchor. No page should be pure feature claims — evidence grounds the experience and builds trust." },
+  { rule: "T6 always needs a T3 intro", detail: "Developer docs still need a human opening — the value prop of building here — before descending into code. Technical completeness doesn't replace positioning." },
+  { rule: "Persona routes are always T3", detail: "'For IT Leaders' cards are capability statements, not brand moments (T1) or feature lists (T5). They name an outcome for a specific person and role." },
+];
+
+// ─────────────────────────────────────────────
+// PAGE WIREFRAME DEFINITIONS
+// ─────────────────────────────────────────────
+const PAGES = {
+  homepage: {
+    name: "Homepage",
+    audience: "All audiences — new buyers, evaluators, customers, developers",
+    tierRange: "T1 → T4",
+    rationale: "Opens at the highest inspiration level to orient and capture attention. Routes each audience to appropriate depth. Never descends below T4 — deep content lives in linked destinations. A first-time visitor should understand what ServiceNow is and find their path within 15 seconds.",
+    sections: [
+      { tier: 1, label: "Hero", sub: '"AI That Thinks. Workflows That Act." — single statement + Watch Demo / Get a Sandbox CTA', height: 118 },
+      { tier: 2, label: "Platform Narrative", sub: "Why AI needs workflows: the insight that positions ServiceNow against every standalone LLM and bolt-on AI vendor.", height: 82 },
+      { tier: 3, label: "Persona Routes", sub: "For IT Leaders · For HR Leaders · For Finance Leaders · For CX Leaders · For Developers", height: 72, cols: 5 },
+      { tier: 4, label: "Customer Proof Strip", sub: "AstraZeneca 30k hrs · Adobe 25% faster · Pure Storage 7x resolution · Honeywell 75% compliance", height: 55 },
+      { tier: 3, label: "AI Capability Domains", sub: "IT · CRM · Employee Experience · Risk & Security · Build & Extend — framed as 'where autonomous work happens'", height: 100, cols: 5 },
+      { tier: 2, label: "AI Control Tower Section", sub: "The governance insight: AI agents need the platform more than humans do. Introduces the trust story.", height: 78 },
+      { tier: 5, label: "Now Assist Product Moment", sub: "Animated or interactive product demo — show incident resolution autonomously. Show, don't describe.", height: 95 },
+      { tier: 4, label: "Analyst & Peer Validation", sub: "Gartner MQ Leader · Jensen Huang: 'the best platform, the OS of enterprise AI agents' · 85% of Fortune 500", height: 62 },
+    ],
+  },
+  platform: {
+    name: "Platform Hub",
+    audience: "New buyers + Active evaluators",
+    tierRange: "T2 → T6",
+    rationale: "No T1 — assumes the visitor arrived with intent. Opens at T2 with the platform argument, then descends methodically through evaluation questions (Why Different → How Thinks → What Runs → How Governs). T6 CTAs let evaluators act immediately.",
+    sections: [
+      { tier: 2, label: "Opening Narrative — The Platform Case", sub: "GPS vs. air traffic control. AI that assists individuals vs. AI that runs enterprises. The insight that changes everything.", height: 92 },
+      { tier: 3, label: "Evaluation Framework Navigation", sub: "Why It's Different · How It Thinks · What It Runs · How It Governs", height: 65, cols: 4 },
+      { tier: 3, label: "Workflow Domains Overview", sub: "IT · CRM · Employee · Risk & Security · Build — framed as 'where autonomous work happens'", height: 100, cols: 5 },
+      { tier: 4, label: '"What This Looks Like in Practice"', sub: "The RSU scenario: LLM explains, desktop agent guesses, ServiceNow resolves end-to-end with audit trail.", height: 102 },
+      { tier: 5, label: "How It Thinks — Architecture", sub: "Workflow Data Fabric (450+ systems, zero-copy) · Knowledge Graph & CMDB · AI reasoning layer · Integration surface", height: 92 },
+      { tier: 5, label: "How It Governs — AI Control Tower", sub: "Permissions below the model · Audit trails · Agent identity resolution · Governance OS mechanics", height: 88 },
+      { tier: 4, label: "Platform Scale Bar", sub: "80B+ workflows · 6.5T transactions / yr · 85% Fortune 500 · 98% renewal · Any model / data / cloud", height: 55 },
+      { tier: 6, label: "Explore & Start CTAs", sub: "Download the Blueprint · Schedule Platform Architecture Review · Start Free Sandbox", height: 52 },
+    ],
+  },
+  solutions: {
+    name: "Solutions — IT Leader",
+    audience: "CIO / VP of IT — new buyer or early evaluator",
+    tierRange: "T3 → T5",
+    rationale: "Never opens at T1/T2 — buyer already decided to look. T3 opens with their business outcome. T4 validates with peer proof. T5 maps specific products for the evaluation phase. Analyst recognition reinforces the decision at close.",
+    sections: [
+      { tier: 3, label: "CIO Value Proposition", sub: '"From reactive firefighting to autonomous resolution. Your IT operation runs itself."', height: 85 },
+      { tier: 4, label: "Outcome Data Strip", sub: "AstraZeneca 30k hrs reclaimed · Adobe 25% faster outage resolution · 40%+ MTTR reduction average", height: 62 },
+      { tier: 3, label: "IT Capability Areas", sub: "Incident Management · Problem Management · Change Automation · Asset Intelligence", height: 98, cols: 4 },
+      { tier: 4, label: "Featured Customer Story", sub: "Named CIO, named company — specific before/after: MTTR, ticket volume, team capacity freed for strategic work", height: 118 },
+      { tier: 5, label: "Product Mapping — IT Context", sub: "ITSM · ITOM · ITAM · Now Assist for IT — role of each in IT transformation journey", height: 82, cols: 4 },
+      { tier: 4, label: "Analyst Recognition — IT", sub: "Gartner ITSM Magic Quadrant Leader · Forrester Wave placement · relevant analyst quote in IT context", height: 60 },
+      { tier: 3, label: "Related Solutions", sub: "For Finance Leaders · For HR Leaders · For Risk & Security", height: 56, cols: 3 },
+    ],
+  },
+  product: {
+    name: "Product Page — Now Assist",
+    audience: "Active evaluators — knows they want AI in ITSM",
+    tierRange: "T3 → T6",
+    rationale: "No T1 or T2 — assumes prior context. Opens at T3 with the product outcome, quickly moves to T4 proof and T5 mechanics. T6 (demo, sandbox) is the primary conversion goal. The page builds specificity in layers — you can exit at any tier with enough to decide.",
+    sections: [
+      { tier: 3, label: "Product Value Statement", sub: '"Now Assist resolves IT incidents autonomously — from detection to resolution — before a ticket ever gets opened."', height: 82 },
+      { tier: 4, label: "Use Case Scenario Cards", sub: "IT incident resolution · HR inquiry handling · Customer case deflection · Compliance exception routing", height: 105, cols: 3 },
+      { tier: 5, label: "How Now Assist Works", sub: "Agentic flow: Detect → Analyze → Act → Verify → Audit. Visual step-by-step with system touchpoints and decision gates.", height: 105 },
+      { tier: 4, label: "Product-Specific Proof", sub: "Customer outcomes attributed specifically to Now Assist — not ServiceNow broadly. Named, metric-specific.", height: 62 },
+      { tier: 5, label: "Feature Detail", sub: "AI Skills library · Knowledge base grounding · Response confidence scoring · Human escalation controls", height: 90, cols: 2 },
+      { tier: 5, label: "Integration Surface", sub: "Works with: ITSM · HR Service Delivery · CSM · Integration Hub connectors · Any model provider via open platform", height: 62 },
+      { tier: 6, label: "Demo & Trial CTAs", sub: "Watch Now Assist Demo · Start Free Sandbox · Talk to a Product Specialist", height: 55 },
+    ],
+  },
+  developer: {
+    name: "Learn > Build (Developer Hub)",
+    audience: "Developers and technical evaluators",
+    tierRange: "T3 → T6",
+    rationale: "Opens T3 with the developer value prop — establishes why building here matters. Immediately descends to T6. T4 is used to reinforce platform scale and ecosystem trust, not to sell. The sandbox is the primary conversion goal: developers evaluate by building, not reading.",
+    sections: [
+      { tier: 3, label: "Developer Value Prop", sub: '"Build on the platform that already runs 85% of the Fortune 500. Your app inherits enterprise-grade trust, governance, and scale from day one."', height: 80 },
+      { tier: 6, label: "Free Sandbox — Primary CTA", sub: "Email activation only · No credit card · No sales call · Pre-configured with ITSM, HR, CRM demo data · 60 seconds to first workflow", height: 88 },
+      { tier: 5, label: "Build Path Cards", sub: "App Engine Studio · Integration Hub · Creator Workflows · REST API · Now Assist for Developers", height: 98, cols: 5 },
+      { tier: 4, label: "Platform Scale — Developer Lens", sub: "450+ pre-built connectors · 80B+ workflows / yr · 2M+ developer community · App marketplace · Open model support", height: 70 },
+      { tier: 6, label: "API Reference Preview", sub: "REST API + Table API · cURL & JS examples · OAuth 2.0 · Postman collection download · Rate limit docs", height: 95 },
+      { tier: 6, label: "App Engine Studio", sub: "Flow designer · Script editor · Component library · CI/CD pipeline · Governance by default — no shadow IT", height: 86, cols: 2 },
+      { tier: 5, label: "Developer Resources", sub: "Developer Blog · Community Forums · Certification paths · Changelog · Open-source projects", height: 65, cols: 4 },
+    ],
+  },
+};
+
+// ─────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────
+function ContentTierSystem() {
+  const [activeTab, setActiveTab] = useState("framework");
+  const [selectedTierId, setSelectedTierId] = useState(1);
+  const [selectedPage, setSelectedPage] = useState("homepage");
+  const [hoveredSection, setHoveredSection] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
+
+  const activeTier = TIERS.find((t) => t.id === selectedTierId);
+  const activePage = PAGES[selectedPage];
+
+  const sn = {
+    bg: "#080D14", surface: "#0F1923", card: "#162030",
+    border: "#1E2F44", border2: "#243551",
+    white: "#F8FAFC", g100: "#CBD5E1", g400: "#64748B", g500: "#475569",
+    brand: "#80B6A1", green: "#62D84E",
+  };
+
+  const Tab = ({ id, label }) => (
+    <button
+      onClick={() => setActiveTab(id)}
+      style={{
+        background: "none", border: "none",
+        borderBottom: activeTab === id ? `2px solid ${sn.green}` : "2px solid transparent",
+        color: activeTab === id ? sn.white : sn.g400,
+        cursor: "pointer", fontFamily: "inherit",
+        fontSize: 13, fontWeight: 600,
+        padding: "10px 20px", transition: "all .15s",
+      }}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div style={{ background: sn.bg, color: sn.white, fontFamily: "'Inter', -apple-system, sans-serif", minHeight: "100vh", fontSize: 14, lineHeight: 1.5 }}>
+
+      {/* ── Global Header ── */}
+      <div style={{ padding: "18px 28px 0", borderBottom: `1px solid ${sn.border}` }}>
+        <div class="eyebrow reveal">ServiceNow.com — Content</div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 4 }}>
+          <div style={{ fontSize: 22, fontWeight: 800 }}>Content Tier System</div>
+          <div style={{ paddingBottom:20, color: sn.g400, fontWeight: 500 }}>A shared language for editorial depth — T1 to T6</div>
+        </div>
+        <div style={{ display: "flex", gap: 0 }}>
+          <Tab id="framework" label="The Framework" />
+          <Tab id="wireframes" label="Page Examples" />
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════
+          FRAMEWORK TAB
+      ════════════════════════════════════ */}
+      {activeTab === "framework" && (
+        <div style={{ padding: "24px 28px" }}>
+
+          {/* Tier spectrum bar */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: sn.g400, textTransform: "uppercase", letterSpacing: ".08em", whiteSpace: "nowrap" }}>Brand ↑</div>
+            <div style={{ flex: 1, height: 5, borderRadius: 3, background: "linear-gradient(to right, #62D84E, #00C7B1, #3B8BEB, #F59E0B, #9B72F0, #64748B)" }} />
+            <div style={{ fontSize: 10, fontWeight: 700, color: sn.g400, textTransform: "uppercase", letterSpacing: ".08em", whiteSpace: "nowrap" }}>↓ Technical</div>
+          </div>
+
+          {/* Tier selector cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8, marginBottom: 24 }}>
+            {TIERS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setSelectedTierId(t.id)}
+                style={{
+                  padding: "14px 12px", border: `1px solid ${selectedTierId === t.id ? t.color : sn.border}`,
+                  borderRadius: 10, cursor: "pointer", textAlign: "left",
+                  background: selectedTierId === t.id ? `rgba(${t.rgb},.1)` : sn.surface,
+                  boxShadow: selectedTierId === t.id ? `0 0 0 1px ${t.color}40` : "none",
+                  transition: "all .2s",
+                }}
+              >
+                <div style={{ fontSize: 10, fontWeight: 800, color: t.color, letterSpacing: ".06em", marginBottom: 5 }}>{t.label}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: sn.white, lineHeight: 1.3, marginBottom: 5 }}>{t.name}</div>
+                <div style={{ fontSize: 10, color: sn.g400, marginBottom: 6 }}>{t.altitude}</div>
+                <div style={{ height: 3, borderRadius: 2, background: `rgba(${t.rgb},.4)` }} />
+              </button>
+            ))}
+          </div>
+
+          {/* Selected tier detail — 2 columns */}
+          {activeTier && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+              {/* Left: description + voice note */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ background: sn.surface, border: `1px solid rgba(${activeTier.rgb},.25)`, borderRadius: 12, padding: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `rgba(${activeTier.rgb},.15)`, border: `1px solid rgba(${activeTier.rgb},.3)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: activeTier.color }}>
+                      {activeTier.label}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: sn.white }}>{activeTier.name}</div>
+                      <div style={{ fontSize: 11, color: sn.g400, fontStyle: "italic" }}>{activeTier.tagline}</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 13, color: sn.g100, lineHeight: 1.75 }}>{activeTier.description}</div>
+                </div>
+                <div style={{ background: `rgba(${activeTier.rgb},.07)`, border: `1px solid rgba(${activeTier.rgb},.18)`, borderRadius: 12, padding: 18 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: activeTier.color, marginBottom: 10 }}>Voice Note</div>
+                  <div style={{ fontSize: 12, color: sn.g100, lineHeight: 1.7, fontStyle: "italic" }}>{activeTier.voiceNote}</div>
+                </div>
+              </div>
+
+              {/* Right: use / don't use / examples */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ background: sn.surface, border: `1px solid ${sn.border}`, borderRadius: 12, padding: 18 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.brand, marginBottom: 12 }}>Use here</div>
+                  {activeTier.whenUse.map((w, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: activeTier.color, marginTop: 6, flexShrink: 0 }} />
+                      <div style={{ fontSize: 12, color: sn.g100, lineHeight: 1.5 }}>{w}</div>
+                    </div>
+                  ))}
+                  <div style={{ height: 1, background: sn.border, margin: "14px 0" }} />
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.g400, marginBottom: 10 }}>Not here</div>
+                  {activeTier.whenNot.map((w, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 7, alignItems: "flex-start" }}>
+                      <div style={{ fontSize: 12, color: sn.g400, marginTop: 1, flexShrink: 0 }}>–</div>
+                      <div style={{ fontSize: 12, color: sn.g400, lineHeight: 1.5 }}>{w}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background: sn.surface, border: `1px solid ${sn.border}`, borderRadius: 12, padding: 18 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.brand, marginBottom: 12 }}>Live examples</div>
+                  {activeTier.examples.map((ex, i) => (
+                    <div key={i} style={{
+                      background: `rgba(${activeTier.rgb},.05)`, border: `1px solid rgba(${activeTier.rgb},.14)`,
+                      borderLeft: `3px solid ${activeTier.color}`,
+                      borderRadius: 8, padding: "10px 14px", marginBottom: 10,
+                      fontSize: 12, color: sn.g100, lineHeight: 1.65, fontStyle: "italic",
+                    }}>
+                      {ex}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mixing rules */}
+          <div style={{ background: sn.surface, border: `1px solid ${sn.border}`, borderRadius: 12, padding: 22 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.brand, marginBottom: 18 }}>
+              Rules for mixing tiers on a page
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+              {MIXING_RULES.map((r, i) => (
+                <div key={i} style={{ border: `1px solid ${sn.border}`, borderRadius: 8, padding: 14 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: sn.white, marginBottom: 7 }}>{r.rule}</div>
+                  <div style={{ fontSize: 11, color: sn.g400, lineHeight: 1.65 }}>{r.detail}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════
+          WIREFRAMES TAB
+      ════════════════════════════════════ */}
+      {activeTab === "wireframes" && (
+        <div style={{ display: "flex", height: "calc(100vh - 160px)" }}>
+
+          {/* Page selector sidebar */}
+          <div style={{ width: 210, borderRight: `1px solid ${sn.border}`, padding: "16px 12px", flexShrink: 0, overflowY: "auto" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.g400, marginBottom: 12 }}>Page Examples</div>
+            {Object.entries(PAGES).map(([key, p]) => (
+              <button
+                key={key}
+                onClick={() => { setSelectedPage(key); setSelectedSection(null); }}
+                style={{
+                  width: "100%", textAlign: "left",
+                  background: selectedPage === key ? sn.card : "none",
+                  border: selectedPage === key ? `1px solid ${sn.border}` : "1px solid transparent",
+                  borderRadius: 8, padding: "10px 12px", cursor: "pointer", marginBottom: 4,
+                }}
+              >
+                <div style={{ fontSize: 12, fontWeight: 600, color: selectedPage === key ? sn.white : sn.g400 }}>{p.name}</div>
+                <div style={{ fontSize: 10, color: sn.g400, marginTop: 2 }}>{p.tierRange}</div>
+              </button>
+            ))}
+
+            {/* Compact tier legend */}
+            <div style={{ marginTop: 22, borderTop: `1px solid ${sn.border}`, paddingTop: 16 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.g400, marginBottom: 12 }}>Tier legend</div>
+              {TIERS.map((t) => (
+                <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 3, background: t.color, flexShrink: 0 }} />
+                  <div style={{ fontSize: 11, color: sn.g400 }}>
+                    <span style={{ color: t.color, fontWeight: 700 }}>{t.label}</span> {t.name}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tier distribution for selected page */}
+            <div style={{ marginTop: 18, borderTop: `1px solid ${sn.border}`, paddingTop: 16 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", color: sn.g400, marginBottom: 12 }}>Tier distribution</div>
+              {(() => {
+                const counts = {};
+                activePage.sections.forEach((s) => { counts[s.tier] = (counts[s.tier] || 0) + 1; });
+                const total = activePage.sections.length;
+                return TIERS.filter((t) => counts[t.id]).map((t) => (
+                  <div key={t.id} style={{ marginBottom: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <div style={{ fontSize: 10, color: t.color, fontWeight: 700 }}>{t.label}</div>
+                      <div style={{ fontSize: 10, color: sn.g400 }}>{counts[t.id]} section{counts[t.id] > 1 ? "s" : ""}</div>
+                    </div>
+                    <div style={{ height: 4, background: sn.card, borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${(counts[t.id] / total) * 100}%`, background: t.color, borderRadius: 2 }} />
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
+
+          {/* Wireframe canvas */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
+            {/* Page meta */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 5 }}>{activePage.name}</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 20, fontSize: 12, color: sn.g400, marginBottom: 6 }}>
+                <span>Audience: <span style={{ color: sn.g100 }}>{activePage.audience}</span></span>
+                <span>Tier Range: <span style={{ color: sn.green, fontWeight: 700 }}>{activePage.tierRange}</span></span>
+              </div>
+              <div style={{ fontSize: 12, color: sn.g400, lineHeight: 1.65, maxWidth: 640 }}>{activePage.rationale}</div>
+            </div>
+
+            {/* Wireframe */}
+            <div style={{ border: `1px solid ${sn.border}`, borderRadius: 12, overflow: "hidden", maxWidth: 740 }}>
+              {/* Browser chrome */}
+              <div style={{ background: sn.surface, padding: "8px 14px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${sn.border}` }}>
+                <div style={{ display: "flex", gap: 5 }}>
+                  {["#EF4444", "#F59E0B", "#62D84E"].map((c, i) => (
+                    <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />
+                  ))}
+                </div>
+                <div style={{ flex: 1, background: sn.card, borderRadius: 4, padding: "3px 10px", fontSize: 10, color: sn.g500 }}>
+                  servicenow.com
+                </div>
+              </div>
+
+              {/* Nav bar */}
+              <div style={{ background: "#0A1520", padding: "10px 20px", display: "flex", alignItems: "center", gap: 20, borderBottom: `1px solid ${sn.border}` }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: sn.green }}>servicenow.</div>
+                {["Platform", "Solutions", "Customers", "Learn"].map((n) => (
+                  <div key={n} style={{ fontSize: 11, color: sn.g400 }}>{n}</div>
+                ))}
+                <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+                  <div style={{ border: `1px solid ${sn.border2}`, borderRadius: 4, padding: "3px 9px", fontSize: 10, color: sn.g100 }}>Sign In</div>
+                  <div style={{ background: sn.green, borderRadius: 4, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: "#0B1A09" }}>Watch Demo</div>
+                </div>
+              </div>
+
+              {/* Content sections */}
+              <div style={{ background: sn.bg }}>
+                {activePage.sections.map((section, i) => {
+                  const t = TIERS.find((x) => x.id === section.tier);
+                  const isSel = selectedSection?.index === i;
+                  const isHov = hoveredSection === i;
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => setSelectedSection(isSel ? null : { ...section, index: i })}
+                      onMouseEnter={() => setHoveredSection(i)}
+                      onMouseLeave={() => setHoveredSection(null)}
+                      style={{
+                        minHeight: section.height,
+                        borderBottom: `1px solid ${sn.border}`,
+                        borderLeft: `4px solid ${isSel || isHov ? t.color : `rgba(${t.rgb},.35)`}`,
+                        background: isSel ? `rgba(${t.rgb},.11)` : isHov ? `rgba(${t.rgb},.07)` : `rgba(${t.rgb},.03)`,
+                        padding: "10px 16px",
+                        cursor: "pointer",
+                        transition: "all .15s",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                        <div style={{ flex: 1, marginRight: 12 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: isSel || isHov ? sn.white : sn.g100, marginBottom: 4 }}>
+                            {section.label}
+                          </div>
+                          <div style={{ fontSize: 11, color: sn.g400, lineHeight: 1.55, maxWidth: 500 }}>
+                            {section.sub}
+                          </div>
+                        </div>
+                        <div style={{
+                          background: t.color, color: "#080D14",
+                          borderRadius: 4, padding: "2px 8px",
+                          fontSize: 9, fontWeight: 800, letterSpacing: ".06em",
+                          flexShrink: 0, alignSelf: "flex-start",
+                        }}>
+                          {t.label}
+                        </div>
+                      </div>
+
+                      {/* Column placeholders */}
+                      {section.cols && (
+                        <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                          {Array.from({ length: section.cols }).map((_, ci) => (
+                            <div key={ci} style={{
+                              flex: 1, height: 24, borderRadius: 5,
+                              background: `rgba(${t.rgb},.12)`,
+                              border: `1px solid rgba(${t.rgb},.2)`,
+                            }} />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Hover hint */}
+                      {isHov && !isSel && (
+                        <div style={{ position: "absolute", bottom: 6, right: 14, fontSize: 9, color: sn.g500, fontStyle: "italic" }}>
+                          Click to inspect tier →
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Footer */}
+                <div style={{ height: 42, background: "#0A1520", display: "flex", alignItems: "center", padding: "0 20px" }}>
+                  <div style={{ fontSize: 10, color: sn.border2 }}>
+                    Global Footer — Platform · Solutions · Customers · Learn · Legal · Privacy
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Empty state hint */}
+            {!selectedSection && (
+              <div style={{ marginTop: 14, fontSize: 12, color: sn.g500, fontStyle: "italic" }}>
+                Click any section in the wireframe to inspect its tier definition and voice guidelines.
+              </div>
+            )}
+          </div>
+
+          {/* Section inspector panel */}
+          {selectedSection && (() => {
+            const t = TIERS.find((x) => x.id === selectedSection.tier);
+            return (
+              <div style={{
+                width: 290, borderLeft: `1px solid ${sn.border}`,
+                padding: "18px 16px", overflowY: "auto", flexShrink: 0,
+                background: sn.surface,
+              }}>
+                {/* Header */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: t.color, letterSpacing: ".08em", marginBottom: 3 }}>
+                      {t.label} — {t.name}
+                    </div>
+                    <div style={{ fontSize: 10, color: sn.g400, fontStyle: "italic" }}>{t.altitude} · {t.tagline}</div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedSection(null)}
+                    style={{ background: "none", border: "none", color: sn.g400, cursor: "pointer", fontSize: 15, lineHeight: 1 }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Section content */}
+                <div style={{ background: `rgba(${t.rgb},.08)`, border: `1px solid rgba(${t.rgb},.2)`, borderRadius: 8, padding: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: sn.white, marginBottom: 5 }}>{selectedSection.label}</div>
+                  <div style={{ fontSize: 11, color: sn.g100, lineHeight: 1.6 }}>{selectedSection.sub}</div>
+                </div>
+
+                <div style={{ height: 1, background: sn.border, marginBottom: 16 }} />
+
+                {/* Tier definition */}
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".09em", color: sn.brand, marginBottom: 10 }}>
+                  Tier definition
+                </div>
+                <div style={{ fontSize: 12, color: sn.g100, lineHeight: 1.7, marginBottom: 16 }}>{t.description}</div>
+
+                {/* Voice note */}
+                <div style={{ background: `rgba(${t.rgb},.07)`, border: `1px solid rgba(${t.rgb},.15)`, borderRadius: 8, padding: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".09em", color: t.color, marginBottom: 8 }}>Voice note</div>
+                  <div style={{ fontSize: 11, color: sn.g100, lineHeight: 1.65, fontStyle: "italic" }}>{t.voiceNote}</div>
+                </div>
+
+                {/* Examples */}
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".09em", color: sn.brand, marginBottom: 10 }}>
+                  Copy examples
+                </div>
+                {t.examples.map((ex, i) => (
+                  <div key={i} style={{
+                    borderLeft: `3px solid ${t.color}`,
+                    padding: "8px 12px", marginBottom: 10,
+                    fontSize: 11, color: sn.g100, lineHeight: 1.65, fontStyle: "italic",
+                    background: `rgba(${t.rgb},.04)`, borderRadius: "0 6px 6px 0",
+                  }}>
+                    {ex}
+                  </div>
+                ))}
+
+                {/* Use / Don't use */}
+                <div style={{ height: 1, background: sn.border, margin: "14px 0" }} />
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".09em", color: sn.brand, marginBottom: 10 }}>
+                  When to use
+                </div>
+                {t.whenUse.map((w, i) => (
+                  <div key={i} style={{ display: "flex", gap: 7, marginBottom: 7, alignItems: "flex-start" }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: t.color, marginTop: 6, flexShrink: 0 }} />
+                    <div style={{ fontSize: 11, color: sn.g100, lineHeight: 1.5 }}>{w}</div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+      )}
+    </div>
+  );
+}
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<ContentTierSystem />);
+  </script>
+</body>
+</html>

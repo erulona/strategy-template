@@ -1,0 +1,83 @@
+/* Shared styles across ServiceNow Vision docs */
+
+:root {
+  --x-nav-height: 44px;
+}
+
+/* ─── Cross-Page Navigation ─── */
+.x-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  height: var(--x-nav-height);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+
+  background: rgba(8, 13, 20, 0.97);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--sn-border, var(--border, #1E2F44));
+
+  font-family: var(--font, 'Inter', -apple-system, sans-serif);
+}
+
+.x-nav-brand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sn-brand-light, var(--brand-lt, #80B6A1));
+  white-space: nowrap;
+  padding-right: 20px;
+  margin-right: 20px;
+  border-right: 1px solid var(--sn-border, var(--border, #1E2F44));
+  flex-shrink: 0;
+}
+
+.x-nav-sep {
+  color: var(--sn-gray-500, var(--g500, #475569));
+  margin: 0 5px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.x-nav-client {
+  color: var(--sn-gray-500, var(--g500, #475569));
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.x-nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.x-nav-link {
+  text-decoration: none;
+  color: var(--sn-gray-400, var(--g400, #64748B));
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0 14px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.x-nav-link:hover {
+  color: var(--sn-gray-100, var(--g100, #CBD5E1));
+}
+
+.x-nav-link.x-active {
+  color: var(--sn-green, var(--green, #62D84E));
+  border-bottom-color: var(--sn-green, var(--green, #62D84E));
+  font-weight: 600;
+}
+
