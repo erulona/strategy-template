@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServiceNow.com — UX & Experience Audit | Instrument</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ─── ServiceNow Design System Tokens ─── */
+    :root {
+      --sn-bg:          #080D14;
+      --sn-surface:     #0F1923;
+      --sn-card:        #162030;
+      --sn-card-hover:  #1C2A40;
+      --sn-border:      #1E2F44;
+      --sn-border-light:#243551;
+
+      /* Brand Green / Teal spectrum */
+      --sn-green:       #62D84E;
+      --sn-green-mid:   #4EC9A8;
+      --sn-teal:        #00C7B1;
+      --sn-teal-dim:    rgba(0,199,177,0.12);
+      --sn-green-dim:   rgba(98,216,78,0.12);
+      --sn-brand-dark:  #293E40;
+      --sn-brand-mid:   #3D5E62;
+      --sn-brand-light: #80B6A1;
+
+      /* Neutral */
+      --sn-white:       #F8FAFC;
+      --sn-gray-50:     #F1F5F9;
+      --sn-gray-100:    #CBD5E1;
+      --sn-gray-400:    #64748B;
+      --sn-gray-500:    #475569;
+
+      /* Severity palette */
+      --sn-critical:    #EF4444;
+      --sn-critical-dim:rgba(239,68,68,0.12);
+      --sn-high:        #F97316;
+      --sn-high-dim:    rgba(249,115,22,0.12);
+      --sn-medium:      #EAB308;
+      --sn-medium-dim:  rgba(234,179,8,0.12);
+      --sn-low:         #22C55E;
+      --sn-low-dim:     rgba(34,197,94,0.12);
+
+      /* Score colors */
+      --score-great:    #62D84E;
+      --score-good:     #00C7B1;
+      --score-fair:     #EAB308;
+      --score-weak:     #F97316;
+      --score-poor:     #EF4444;
+
+      /* Typography */
+      --font:           'Inter', -apple-system, sans-serif;
+      --radius:         10px;
+      --radius-lg:      16px;
+      --radius-sm:      6px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--sn-bg);
+      color: var(--sn-white);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-top: 44px;
+    }
+
+    /* ─── Layout ─── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+    /* ─── Top Banner ─── */
+    .top-bar {
+      background: var(--sn-brand-dark);
+      border-bottom: 1px solid var(--sn-brand-mid);
+      padding: 12px 0;
+    }
+    .top-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .instrument-wordmark {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sn-brand-light);
+    }
+    .top-bar-meta {
+      font-size: 11px;
+      color: var(--sn-brand-light);
+      opacity: 0.7;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Header ─── */
+    .site-header {
+      padding: 56px 0 48px;
+      border-bottom: 1px solid var(--sn-border);
+      background: linear-gradient(180deg, rgba(41,62,64,0.3) 0%, transparent 100%);
+    }
+    .header-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sn-teal);
+      margin-bottom: 20px;
+    }
+    .header-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--sn-teal);
+    }
+    .site-header h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: var(--sn-white);
+    }
+    .site-header h1 span { color: var(--sn-green); }
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 28px;
+    }
+    .header-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .header-meta-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--sn-gray-400);
+    }
+    .header-meta-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--sn-gray-100);
+    }
+
+    /* ─── Score Badge ─── */
+    .overall-score-block {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--sn-card);
+      border: 1px solid var(--sn-border);
+      border-radius: var(--radius-lg);
+      padding: 24px 32px;
+      margin: 40px 0;
+    }
+    .score-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 3px solid var(--sn-medium);
+      background: var(--sn-medium-dim);
+    }
+    .score-circle .score-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--sn-medium);
+      line-height: 1;
+    }
+    .score-context h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .score-context p {
+      font-size: 13px;
+      color: var(--sn-gray-100);
+      max-width: 680px;
+    }
+    .score-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .score-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .score-pill.sev-critical { color: var(--sn-critical); border-color: var(--sn-critical); background: var(--sn-critical-dim); }
+    .score-pill.sev-high     { color: var(--sn-high);     border-color: var(--sn-high);     background: var(--sn-high-dim); }
+    .score-pill.sev-medium   { color: var(--sn-medium);   border-color: var(--sn-medium);   background: var(--sn-medium-dim); }
+    .score-pill.sev-low      { color: var(--sn-low);      border-color: var(--sn-low);      background: var(--sn-low-dim); }
+
+    /* ─── Navigation Tabs (sticky below cross-page .x-nav) ─── */
+    .nav-tabs {
+      position: sticky;
+      top: var(--x-nav-height, 44px);
+      z-index: 100;
+      background: rgba(8,13,20,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--sn-border);
+      padding: 0;
+    }
+    .nav-tabs-inner {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-tabs-inner::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--sn-gray-400);
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 16px 20px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+    .tab-btn:hover { color: var(--sn-gray-100); }
+    .tab-btn.active {
+      color: var(--sn-green);
+      border-bottom-color: var(--sn-green);
+      font-weight: 600;
+    }
+
+    /* ─── Section ─── */
+    .section {
+      padding: 56px 0;
+      display: none;
+    }
+    .section.active { display: block; }
+
+    .section-header {
+      margin-bottom: 40px;
+    }
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sn-teal);
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .section-header p {
+      font-size: 15px;
+      color: var(--sn-gray-100);
+      max-width: 640px;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--sn-card);
+      border: 1px solid var(--sn-border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--sn-border-light); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .container { padding: 0 20px; }
+      .overall-score-block { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ─── Dimension Score Rows ─── */
+    .dimension-list { display: flex; flex-direction: column; gap: 12px; }
+    .dimension-item {
+      background: var(--sn-card);
+      border: 1px solid var(--sn-border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dimension-item:hover {
+      border-color: var(--sn-border-light);
+      background: var(--sn-card-hover);
+    }
+    .dimension-item.expanded { border-color: var(--sn-teal); }
+    .dimension-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .dim-score-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .dim-score-badge.great  { background: rgba(98,216,78,0.15);  color: var(--score-great); }
+    .dim-score-badge.good   { background: rgba(0,199,177,0.15);  color: var(--score-good); }
+    .dim-score-badge.fair   { background: rgba(234,179,8,0.15);  color: var(--score-fair); }
+    .dim-score-badge.weak   { background: rgba(249,115,22,0.15); color: var(--score-weak); }
+    .dim-score-badge.poor   { background: rgba(239,68,68,0.15);  color: var(--score-poor); }
+
+    .dim-info { flex: 1; }
+    .dim-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .dim-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dim-bar-track {
+      flex: 1;
+      height: 4px;
+      background: var(--sn-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .dim-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dim-bar-label {
+      font-size: 11px;
+      color: var(--sn-gray-400);
+      white-space: nowrap;
+    }
+    .dim-expand-icon {
+      font-size: 18px;
+      color: var(--sn-gray-400);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .dimension-item.expanded .dim-expand-icon { transform: rotate(180deg); }
+    .dimension-body {
+      display: none;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--sn-border);
+    }
+    .dimension-item.expanded .dimension-body { display: block; }
+
+    .finding-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .finding-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+    .finding-text {
+      font-size: 13px;
+      color: var(--sn-gray-100);
+      line-height: 1.6;
+    }
+    .finding-text strong { color: var(--sn-white); font-weight: 600; }
+
+    /* ─── Severity Badge ─── */
+    .sev-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .sev-badge.critical { background: var(--sn-critical-dim); color: var(--sn-critical); }
+    .sev-badge.high     { background: var(--sn-high-dim);     color: var(--sn-high); }
+    .sev-badge.medium   { background: var(--sn-medium-dim);   color: var(--sn-medium); }
+    .sev-badge.low      { background: var(--sn-low-dim);      color: var(--sn-low); }
+
+    /* ─── Competitor Table ─── */
+    .comp-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--sn-border);
+    }
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .comp-table th {
+      background: var(--sn-card);
+      color: var(--sn-gray-400);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--sn-border);
+      white-space: nowrap;
+    }
+    .comp-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--sn-border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table tr:hover td { background: var(--sn-card-hover); }
+    .comp-table td.highlight {
+      background: rgba(0,199,177,0.05);
+    }
+
+    .score-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 26px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .score-chip.s9, .score-chip.s10 { background: rgba(98,216,78,0.15);  color: var(--score-great); }
+    .score-chip.s8  { background: rgba(0,199,177,0.15);  color: var(--score-good); }
+    .score-chip.s7  { background: rgba(0,199,177,0.12);  color: var(--score-good); }
+    .score-chip.s6  { background: rgba(234,179,8,0.12);  color: var(--score-fair); }
+    .score-chip.s5  { background: rgba(249,115,22,0.12); color: var(--score-weak); }
+    .score-chip.s4  { background: rgba(239,68,68,0.12);  color: var(--score-poor); }
+    .score-chip.s3  { background: rgba(239,68,68,0.15);  color: var(--score-poor); }
+
+    .comp-name { font-weight: 600; color: var(--sn-white); }
+    .comp-category {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .comp-category.direct    { background: rgba(59,130,246,0.15); color: #60A5FA; }
+    .comp-category.aspirational { background: rgba(168,85,247,0.15); color: #C084FC; }
+    .comp-highlight { color: var(--sn-gray-100); }
+    .comp-watch { color: var(--sn-gray-400); font-size: 12px; }
+
+    /* ─── Recommendation Cards ─── */
+    .rec-list { display: flex; flex-direction: column; gap: 16px; }
+    .rec-card {
+      background: var(--sn-card);
+      border: 1px solid var(--sn-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .rec-card { grid-template-columns: 1fr; }
+    }
+    .rec-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--sn-gray-400);
+      margin-bottom: 6px;
+    }
+    .rec-value {
+      font-size: 13px;
+      color: var(--sn-gray-100);
+      line-height: 1.5;
+    }
+    .rec-value strong { color: var(--sn-white); font-weight: 600; }
+    .impact-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .impact-badge.critical { background: var(--sn-critical-dim); color: var(--sn-critical); }
+    .impact-badge.high     { background: var(--sn-high-dim);     color: var(--sn-high); }
+    .impact-badge.medium   { background: var(--sn-medium-dim);   color: var(--sn-medium); }
+
+    /* ─── Quick Wins ─── */
+    .qw-table-wrap {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--sn-border);
+      overflow: hidden;
+    }
+    .qw-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .qw-table th {
+      background: var(--sn-card);
+      color: var(--sn-gray-400);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--sn-border);
+    }
+    .qw-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--sn-border);
+      vertical-align: top;
+      line-height: 1.5;
+      color: var(--sn-gray-100);
+    }
+    .qw-table tr:last-child td { border-bottom: none; }
+    .qw-table tr:hover td { background: var(--sn-card-hover); }
+    .qw-table td:first-child { color: var(--sn-white); font-weight: 500; }
+
+    /* ─── Metrics Table ─── */
+    .metrics-table-wrap {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--sn-border);
+      overflow: hidden;
+    }
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .metrics-table th {
+      background: var(--sn-card);
+      color: var(--sn-gray-400);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--sn-border);
+    }
+    .metrics-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--sn-border);
+      vertical-align: top;
+      color: var(--sn-gray-100);
+      line-height: 1.5;
+    }
+    .metrics-table tr:last-child td { border-bottom: none; }
+    .metrics-table tr:hover td { background: var(--sn-card-hover); }
+
+    /* ─── Horizon Cards ─── */
+    .horizon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 900px) { .horizon-grid { grid-template-columns: 1fr; } }
+    .horizon-card {
+      background: var(--sn-card);
+      border: 1px solid var(--sn-border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+    .horizon-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .horizon-label .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .horizon-label.now .dot    { background: var(--sn-critical); }
+    .horizon-label.next .dot   { background: var(--sn-high); }
+    .horizon-label.later .dot  { background: var(--sn-teal); }
+    .horizon-label.now   { color: var(--sn-critical); }
+    .horizon-label.next  { color: var(--sn-high); }
+    .horizon-label.later { color: var(--sn-teal); }
+    .horizon-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .horizon-subtitle {
+      font-size: 12px;
+      color: var(--sn-gray-400);
+      margin-bottom: 20px;
+    }
+    .horizon-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+    .horizon-item-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--sn-border-light);
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+    .horizon-item-text {
+      font-size: 13px;
+      color: var(--sn-gray-100);
+      line-height: 1.5;
+    }
+
+    /* ─── Chart Container ─── */
+    .chart-wrap {
+      position: relative;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    /* ─── Summary Stat Grid ─── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: var(--sn-card);
+      border: 1px solid var(--sn-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--sn-gray-400);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Insight Box ─── */
+    .insight-box {
+      background: var(--sn-teal-dim);
+      border: 1px solid rgba(0,199,177,0.25);
+      border-left: 3px solid var(--sn-teal);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 13px;
+      color: var(--sn-gray-100);
+      line-height: 1.7;
+    }
+    .insight-box strong { color: var(--sn-white); }
+
+    /* ─── Footer ─── */
+    .site-footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--sn-border);
+      margin-top: 40px;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-brand {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sn-brand-light);
+    }
+    .footer-note {
+      font-size: 11px;
+      color: var(--sn-gray-400);
+    }
+
+    /* ─── Utility ─── */
+    .divider { height: 1px; background: var(--sn-border); margin: 32px 0; }
+    .mb-8  { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mb-32 { margin-bottom: 32px; }
+    .mt-24 { margin-top: 24px; }
+
+    /* ─── Scroll Reveal ─── */
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s, transform 0.5s; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+  </style>
+</head>
+<body>
+
+<!-- Cross-Page Navigation -->
+<nav class="x-nav">
+  <div class="x-nav-brand">Instrument <span class="x-nav-sep">·</span> <span class="x-nav-client">ServiceNow</span></div>
+  <div class="x-nav-links">
+    <a href="servicenow-ux-audit.html" class="x-nav-link x-active">UX Audit</a>
+    <a href="servicenow-ia-vision.html" class="x-nav-link">IA Vision</a>
+    <a href="content-tier-system.html" class="x-nav-link">Content Tiers</a>
+  </div>
+</nav>
+
+
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-eyebrow">UX &amp; Experience Audit</div>
+    <h1>servicenow.com<br /><span>Finding What's Holding the Site Back</span></h1>
+    <div class="header-meta">
+      <div class="header-meta-item">
+        <span class="header-meta-label">Client</span>
+        <span class="header-meta-value">ServiceNow</span>
+      </div>
+      <div class="header-meta-item">
+        <span class="header-meta-label">Scope</span>
+        <span class="header-meta-value">Marketing Website / servicenow.com</span>
+      </div>
+      <div class="header-meta-item">
+        <span class="header-meta-label">Industry</span>
+        <span class="header-meta-value">Enterprise Software / AI Platform</span>
+      </div>
+      <div class="header-meta-item">
+        <span class="header-meta-label">Target Audiences</span>
+        <span class="header-meta-value">C-Suite, Dept. Leads, IT Buyers, Builders</span>
+      </div>
+      <div class="header-meta-item">
+        <span class="header-meta-label">Prepared By</span>
+        <span class="header-meta-value">Instrument — Digital Strategy</span>
+      </div>
+      <div class="header-meta-item">
+        <span class="header-meta-label">Date</span>
+        <span class="header-meta-value">April 2026</span>
+      </div>
+    </div>
+
+    <!-- Overall Score -->
+    <div class="overall-score-block reveal">
+      <div class="score-circle">
+        <div class="score-num">5.1</div>
+      </div>
+      <div class="score-context">
+        <h2>Overall Score: <span style="color:var(--sn-medium)">5.1 / 10 — Needs Strategic Redesign</span></h2>
+        <p>servicenow.com communicates that AI is central to the platform, but it doesn't yet communicate <em>why that matters to any specific buyer</em>. The site suffers from platform complexity spilling into the front-end — dense navigation, fragmented AI messaging, and multiple competing CTAs that leave high-intent visitors without a clear next step. Against Salesforce.com and leading AI-native benchmarks, the gap in experience quality is significant.</p>
+        <div class="score-pills">
+          <span class="score-pill sev-critical">3 Critical Findings</span>
+          <span class="score-pill sev-high">5 High Issues</span>
+          <span class="score-pill sev-medium">6 Medium Issues</span>
+          <span class="score-pill sev-low">4 Quick Wins</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Navigation Tabs -->
+<nav class="nav-tabs">
+  <div class="container">
+    <div class="nav-tabs-inner">
+      <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+      <button class="tab-btn" onclick="showTab('findings')">Findings by Dimension</button>
+      <button class="tab-btn" onclick="showTab('competitors')">Competitor Benchmarks</button>
+      <button class="tab-btn" onclick="showTab('ai-benchmarks')">AI / LLM Benchmarks</button>
+      <button class="tab-btn" onclick="showTab('roadmap')">Strategic Roadmap</button>
+      <button class="tab-btn" onclick="showTab('quickwins')">Quick Wins</button>
+      <button class="tab-btn" onclick="showTab('metrics')">Metrics to Monitor</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     TAB 1 — OVERVIEW
+═══════════════════════════════════════════ -->
+<main>
+<div class="container">
+
+<section id="overview" class="section active">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Executive Summary</div>
+    <h2>The Core Problem</h2>
+    <p>ServiceNow has one of the most powerful enterprise platforms on the market. Its website does not reflect that. Platform breadth has become an IA liability, and "Put AI to Work" is a campaign line masquerading as a value proposition.</p>
+  </div>
+
+  <div class="stat-grid reveal">
+    <div class="stat-card">
+      <div class="stat-number" style="color:var(--sn-medium)">5.1</div>
+      <div class="stat-label">Overall Score /10</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color:var(--sn-critical)">4.0</div>
+      <div class="stat-label">Conversion Design /10</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color:var(--sn-high)">4.5</div>
+      <div class="stat-label">AI Narrative Clarity /10</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color:var(--score-good)">8.0</div>
+      <div class="stat-label">Salesforce Benchmark</div>
+    </div>
+  </div>
+
+  <div class="grid-2 mb-32 reveal">
+    <div>
+      <div class="chart-wrap">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="height:100%">
+        <div class="mb-16" style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--sn-gray-400);">Where ServiceNow Falls Short</div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>Conversion architecture is broken.</strong> No clear primary CTA hierarchy. Demo, trial, and contact paths compete without logic. High-intent visitors arrive and leave without being moved.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>IA is built for the org chart, not the buyer.</strong> Navigation reflects ServiceNow's internal product taxonomy — IT, HR, Finance, CX — rather than how buyers think about their problems. No role-based wayfinding.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>"Put AI to Work" doesn't close the loop.</strong> The hero message lands without specificity or proof. Competitors like Salesforce anchor their AI narrative in named products, measurable outcomes, and actual customer evidence at every scroll.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>AI messaging is fragmented across Now Assist, Agentic AI, AI Control Tower, and AI Agent Fabric.</strong> Each exists without a unifying story that shows how they connect and what they deliver together.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Proof arrives too late in the journey.</strong> Social proof, case studies, and G2/Gartner validation appear well below the fold and aren't woven into the product narrative where decisions actually happen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-header reveal mt-24">
+    <div class="section-eyebrow">Strategic Implication</div>
+    <h2>The Opportunity</h2>
+  </div>
+  <div class="grid-3 reveal">
+    <div class="card">
+      <div style="font-size:28px; margin-bottom:12px;">🎯</div>
+      <div style="font-weight:700; margin-bottom:8px; font-size:15px;">Buyer-First Navigation</div>
+      <div style="font-size:13px; color:var(--sn-gray-100);">Restructure the IA around who the buyer is and what problem they're solving — not around ServiceNow's product line. Role-based entry points (CIO, CHRO, CFO, Developer) reduce cognitive load and immediately signal relevance.</div>
+    </div>
+    <div class="card">
+      <div style="font-size:28px; margin-bottom:12px;">⚡</div>
+      <div style="font-weight:700; margin-bottom:8px; font-size:15px;">Unified AI Narrative</div>
+      <div style="font-size:13px; color:var(--sn-gray-100);">ServiceNow has the right AI products. What it lacks is an editorial narrative that connects them. "The AI Platform for the Enterprise" — with a clear hierarchy of Now Assist → Agentic AI → AI Control Tower — creates a story that earns the headline.</div>
+    </div>
+    <div class="card">
+      <div style="font-size:28px; margin-bottom:12px;">📈</div>
+      <div style="font-weight:700; margin-bottom:8px; font-size:15px;">Conversion Architecture</div>
+      <div style="font-size:13px; color:var(--sn-gray-100);">One primary action per page. A clear, accessible demo or trial path. Customer proof woven into product pages, not siloed in a case study library. These changes alone can meaningfully move form completion and demo request rates.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TAB 2 — FINDINGS BY DIMENSION
+═══════════════════════════════════════════ -->
+<section id="findings" class="section">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Scored Evaluation</div>
+    <h2>Findings by Dimension</h2>
+    <p>Each dimension scored on a 1–10 scale, benchmarked against enterprise SaaS leaders. Click any row to expand the detailed finding.</p>
+  </div>
+  <div class="insight-box reveal">
+    <strong>Score context:</strong> 8–10 = benchmark-setting or best-in-class. 6–7 = functional with clear improvement areas. 4–5 = significant gaps that affect buyer journey and conversion. 1–3 = critical failure requiring immediate redesign. Salesforce Agentforce is the primary competitive benchmark.
+  </div>
+
+  <div class="dimension-list reveal" id="dimList">
+
+    <!-- 1. Value Proposition -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge weak">5</div>
+        <div class="dim-info">
+          <div class="dim-name">1. Value Proposition Clarity</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:50%; background:var(--score-weak)"></div></div>
+            <div class="dim-bar-label">5 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge critical">Critical</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>"Put AI to Work" is a campaign slogan, not a value proposition.</strong> It does not communicate who this is for, what problem it solves, or what outcome the buyer should expect. Contrast with Salesforce's "Build, deploy, and manage AI agents at scale" — same brevity, far more specificity.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Hero section lacks quantified outcomes.</strong> Enterprise buyers need numbers — cost reduction %, time saved, ROI — at or near the fold. The hero reads more like branding than a business case.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Platform breadth obscures core value.</strong> ServiceNow's cross-department reach is a differentiated strength, but the homepage tries to say everything and ends up saying nothing with specificity. OpenAI's radical simplicity — one product, one message, one CTA — is instructive even if not directly replicable at enterprise scale.</div>
+        </div>
+        <div class="insight-box">
+          <strong>Recommendation:</strong> Introduce a tiered value prop system: a single unifying platform statement at the hero, followed by role-specific value ladders (CIO: "Cut IT costs by 30%", CHRO: "Resolve HR requests 5x faster") surfaced through persona-based navigation or scroll sections.
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Navigation & IA -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge weak">5</div>
+        <div class="dim-info">
+          <div class="dim-name">2. Navigation &amp; Information Architecture</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:50%; background:var(--score-weak)"></div></div>
+            <div class="dim-bar-label">5 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge critical">Critical</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>The mega-nav is organized around ServiceNow's product taxonomy, not buyer mental models.</strong> Products → Solutions → Industries → Resources is a logical internal structure, but enterprise buyers don't think in those categories. They think: "I'm a CIO dealing with a security backlog" or "We're moving to a cloud-first HR model." The IA offers no role-based entry points.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Cognitive load in the mega-nav is high.</strong> The Products dropdown alone contains 10+ items across multiple categories with minimal hierarchy. Users experience decision paralysis rather than clear wayfinding. Salesforce by contrast uses role-based navigation (For Sales, For Service, For Marketing) to immediately establish context.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Developer and builder personas are underserved.</strong> There is no clear "Build on ServiceNow" or Creator Workflows entry point at the nav level. Competitors like Google (Vertex AI) and Salesforce lead with developer access. This is a retention and expansion risk with the growing developer-influenced buying motion in enterprise.</div>
+        </div>
+        <div class="insight-box">
+          <strong>Recommendation:</strong> Introduce a secondary persona-based navigation layer: "For IT", "For HR", "For Finance &amp; CX", "For Developers". This can coexist with the product nav but should be the primary entry point on the homepage. Salesforce's role-based nav is the closest model to adapt.
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AI Narrative -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge poor">4.5</div>
+        <div class="dim-info">
+          <div class="dim-name">3. AI Narrative &amp; Positioning</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:45%; background:var(--score-poor)"></div></div>
+            <div class="dim-bar-label">4.5 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge critical">Critical</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>Four distinct AI product names (Now Assist, Agentic AI, AI Control Tower, AI Agent Fabric) exist on the site without a unifying narrative that explains how they relate.</strong> For an enterprise buyer unfamiliar with ServiceNow's product architecture, this creates confusion rather than confidence. Anthropic's approach — one safety-forward message, two audience paths (Developers, Business) — demonstrates the power of disciplined hierarchy even with a complex product suite.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>The AI value story is descriptive, not demonstrative.</strong> "Prompts replacing pages, conversations replacing clicks" is a vivid internal vision but it's not shown on the site. The best AI product marketing — from OpenAI's ChatGPT to Perplexity — gets you inside the product within seconds of arriving. ServiceNow has no interactive demo or sandbox at the marketing layer.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Agentic AI positioning isn't clearly differentiated from Salesforce Agentforce.</strong> Both use the word "agentic." ServiceNow needs a sharper articulation of its unique angle — the single unified data model across IT, HR, Finance — that Salesforce cannot match.</div>
+        </div>
+        <div class="insight-box">
+          <strong>Recommendation:</strong> Build a clear AI narrative architecture: Platform (the foundation) → Now Assist (the AI layer) → Agentic AI (autonomous workflows) → AI Control Tower (governance &amp; visibility). Tell this as a sequence, not a grid of product cards. Add an interactive AI demo module accessible without a form or login — even a scripted walkthrough significantly improves conversion intent.
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Conversion Design -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge poor">4</div>
+        <div class="dim-info">
+          <div class="dim-name">4. Conversion Design</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:40%; background:var(--score-poor)"></div></div>
+            <div class="dim-bar-label">4 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge critical">Critical</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>No clear primary CTA.</strong> "Watch a Demo," "Contact Sales," "Get Started," and variations appear across the homepage without hierarchy. Each page should have one primary action and one secondary. CTA proliferation reduces click-through on all of them — Baymard Institute research consistently demonstrates this pattern.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-critical)"></div>
+          <div class="finding-text"><strong>No accessible self-serve or trial path for enterprise exploration.</strong> Salesforce offers an "Agentforce Trial" — visible in the top nav. Google Cloud provides AI Studio free access. ServiceNow has no equivalent, forcing all high-intent users into a contact-sales flow that increases time-to-value and reduces trial-to-purchase rates.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>"Watch Demo" CTA is not appropriately prominent.</strong> For an enterprise product with a complex value story, a guided demo is the highest-intent next step for mid-funnel buyers. It should be the single most prominent action on the homepage — not a secondary link below the fold.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Lead gen forms are entry-point friction.</strong> Content behind forms (whitepapers, reports) are gated early in the journey, discouraging exploration. Progressive profiling — where light content is free and deeper content is gated — performs significantly better for enterprise buyers who are still in evaluation mode.</div>
+        </div>
+        <div class="insight-box">
+          <strong>Recommendation:</strong> Define a conversion hierarchy per page: one primary CTA (Watch Demo or Start Free), one secondary (Contact Sales), one soft (Download Report, no required fields). Introduce an ungated product tour module. Benchmark: Salesforce's Agentforce trial; Google's AI Studio free access.
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Content Quality -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge fair">5.5</div>
+        <div class="dim-info">
+          <div class="dim-name">5. Content Quality &amp; Clarity</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:55%; background:var(--score-fair)"></div></div>
+            <div class="dim-bar-label">5.5 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge high">High</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Copy is feature-forward, not outcome-forward.</strong> Product pages describe capabilities ("Now Assist automates routine tasks") rather than business outcomes ("Resolve 40% more employee requests without adding headcount"). Enterprise buyers — especially C-suite — need outcome-first storytelling.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Heavy use of platform jargon.</strong> Terms like "unified data model," "AI Agent Fabric," and "cross-functional workflow orchestration" appear without explanation or plain-language equivalents. This works for IT technical buyers but creates barriers for HR, Finance, and CX department leaders who are increasingly part of the buying coalition.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Content length is inconsistent across product pages.</strong> Some pages are dense walls of text; others are thin. A consistent information hierarchy — headline, 2-line summary, three outcome bullets, one stat, one CTA — would improve both scanability and completeness across the product suite.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Visual Design -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge fair">6</div>
+        <div class="dim-info">
+          <div class="dim-name">6. Visual Design &amp; Craft</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:60%; background:var(--score-fair)"></div></div>
+            <div class="dim-bar-label">6 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge medium">Medium</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>The dark design aesthetic is distinctive and appropriate for enterprise AI.</strong> This is a strength. The teal/green-on-dark palette sets ServiceNow apart from the light, corporate blues of SAP and Workday. However, execution varies — dark mode is applied inconsistently across pages, breaking visual continuity.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Motion and animation are present but not always purposeful.</strong> Some animations feel decorative rather than communicative — they add page weight without clarifying meaning. Contrast with Linear's motion design, which uses animation specifically to demonstrate product speed and responsiveness.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Product screenshots and UI mockups are underutilized.</strong> The best enterprise product marketing — Notion, Stripe, Linear — shows the actual product experience. ServiceNow's marketing visuals trend toward abstract illustrations and icon systems rather than real UI. This reduces trust for technical buyers.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Trust & Social Proof -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge fair">6</div>
+        <div class="dim-info">
+          <div class="dim-name">7. Trust &amp; Social Proof</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:60%; background:var(--score-fair)"></div></div>
+            <div class="dim-bar-label">6 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge medium">Medium</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Customer logo strips are present but used as decoration.</strong> Fortune 500 logos appear without numbers, outcomes, or named quotes attached. Salesforce's approach — logos with specific results ("Delta reduced case volume by 45%") — is significantly more persuasive at the point of a buying decision.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>G2 and Gartner recognition exist but aren't surfaced with urgency.</strong> Being a Leader in 5+ Gartner Magic Quadrants is a major trust signal for enterprise buyers. These credentials should appear in the hero or immediately below, not buried mid-page or in the footer.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-low)"></div>
+          <div class="finding-text"><strong>The 85%+ of Fortune 500 statistic is a strong anchor but appears inconsistently.</strong> This is one of ServiceNow's most powerful social proof claims. It should appear at or near the hero and repeat at critical decision points throughout the journey.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Mobile Experience -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge weak">5</div>
+        <div class="dim-info">
+          <div class="dim-name">8. Mobile Experience</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:50%; background:var(--score-weak)"></div></div>
+            <div class="dim-bar-label">5 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge high">High</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Navigation complexity compounds on mobile.</strong> The mega-nav collapses into a hamburger menu, but the depth and volume of items create a slow, disorienting experience. Enterprise decision-makers frequently use mobile for initial research — a poor mobile experience at the awareness stage is a meaningful top-of-funnel leak.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Content density is not reformatted for mobile context.</strong> Dense product pages with multiple columns, small type, and animation-heavy sections do not reflow elegantly. The mobile experience reads as a compressed desktop, not a purpose-built mobile journey.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Performance & Accessibility -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge weak">5</div>
+        <div class="dim-info">
+          <div class="dim-name">9. Performance &amp; Accessibility</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:50%; background:var(--score-weak)"></div></div>
+            <div class="dim-bar-label">5 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge medium">Medium</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>Animation-heavy pages carry significant performance cost.</strong> Heavy JavaScript payloads for visual effects slow time-to-interactive, particularly on mobile and in regions with slower connections. For an enterprise product selling to global organizations, performance is a trust signal.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-medium)"></div>
+          <div class="finding-text"><strong>WCAG compliance is claimed at the platform level but inconsistently applied on the marketing site.</strong> Accessibility signals matter increasingly in enterprise procurement — procurement teams at regulated enterprises (government, healthcare, financial services) now require WCAG 2.1 AA as a vendor evaluation criterion.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Developer/Builder Experience -->
+    <div class="dimension-item" onclick="toggleDim(this)">
+      <div class="dimension-header">
+        <div class="dim-score-badge poor">4</div>
+        <div class="dim-info">
+          <div class="dim-name">10. Developer &amp; Builder Experience</div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-track"><div class="dim-bar-fill" style="width:40%; background:var(--score-poor)"></div></div>
+            <div class="dim-bar-label">4 / 10</div>
+          </div>
+        </div>
+        <span class="sev-badge high">High</span>
+        <div class="dim-expand-icon">↓</div>
+      </div>
+      <div class="dimension-body">
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>Developer and low-code/no-code builders are not first-class audiences on the marketing site.</strong> In modern enterprise buying, technical evaluators have significant influence — often initiating the consideration set before procurement or leadership is involved. Google Cloud, Vercel, and Stripe treat developers as primary audiences with dedicated marketing entry points. ServiceNow buries Creator Workflows and developer tools.</div>
+        </div>
+        <div class="finding-item">
+          <div class="finding-dot" style="background:var(--sn-high)"></div>
+          <div class="finding-text"><strong>No sandbox or free trial for builders.</strong> Technical evaluation is blocked behind a contact-sales form. Google Cloud provides free AI Studio credits; Salesforce has a Developer Edition. ServiceNow's lack of a free build/explore path is a significant competitive disadvantage for developer mindshare.</div>
+        </div>
+        <div class="insight-box">
+          <strong>Recommendation:</strong> Launch a dedicated "Build on ServiceNow" marketing path with clear documentation entry, a Creator Workflows showcase, and a sandboxed demo environment accessible without enterprise credentials. This pays dividends in developer community growth and product-led evaluation.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dimension-list -->
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TAB 3 — COMPETITOR BENCHMARKS
+═══════════════════════════════════════════ -->
+<section id="competitors" class="section">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Direct Competitors</div>
+    <h2>Enterprise SaaS Competitive Benchmark</h2>
+    <p>Scored across the same dimensions as ServiceNow. Salesforce (Agentforce) is the primary competitive reference and the closest indicator of what an enterprise AI marketing site should achieve by 2026.</p>
+  </div>
+
+  <div class="comp-table-wrap reveal">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Overall</th>
+          <th>Value Prop</th>
+          <th>Nav / IA</th>
+          <th>AI Narrative</th>
+          <th>Conversion</th>
+          <th>Visual</th>
+          <th>Notable Strength</th>
+          <th>Primary Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="comp-name">ServiceNow</span> <span class="comp-category direct">This Client</span></td>
+          <td><span class="score-chip s5">5.1</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td><span class="score-chip s4">4.5</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td class="comp-highlight">Dark design aesthetic is distinctive. Unified platform story is there if you look for it.</td>
+          <td class="comp-watch">No persona-based wayfinding, fragmented AI narrative, no self-serve demo path.</td>
+        </tr>
+        <tr style="background:rgba(0,199,177,0.04)">
+          <td><span class="comp-name">Salesforce (Agentforce)</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s8">8.0</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td class="comp-highlight">Strongest enterprise AI website benchmark. Role-based nav, accessible Agentforce Trial, dense customer proof. Tight narrative across every page.</td>
+          <td class="comp-watch">Navigation can feel prescriptive. Some product depth pages still dense.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Microsoft (Copilot / Azure)</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s7">7.0</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td class="comp-highlight">Ecosystem trust. M365 integration story. Broad enterprise reach and developer credibility.</td>
+          <td class="comp-watch">Navigation is diffuse. Brand stretched across too many products. Copilot narrative competes with itself across products.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Workday</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s6">6.5</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td class="comp-highlight">Clean, HR-centric navigation. Fortune 500 social proof. Straightforward buyer journey with clear role-based paths.</td>
+          <td class="comp-watch">Narrow functional scope. AI narrative underdeveloped vs. broader platform players.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">SAP</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s4">4.5</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td class="comp-highlight">Deep vertical integration. Strong manufacturing/supply chain credibility. Enterprise trust built over decades.</td>
+          <td class="comp-watch">Legacy UX. Complex navigation. Not a digital experience leader. AI narrative is generic.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">BMC Helix</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s4">4.0</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s3">3.5</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td><span class="score-chip s4">4</span></td>
+          <td class="comp-highlight">Technical depth for IT/AIOps buyers. Strong ITSM credibility with IT operations teams.</td>
+          <td class="comp-watch">Niche positioning limits broader buyer appeal. Limited AI narrative beyond AIOps. Design quality lags significantly.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Freshservice</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s6">6.0</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td class="comp-highlight">Clean UX, transparent pricing, fast time-to-value. Good for mid-market conversion clarity.</td>
+          <td class="comp-watch">Lacks enterprise scale story. Agentic AI narrative thin. Not a credible threat at F500 level.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Zendesk</span> <span class="comp-category direct">Direct</span></td>
+          <td><span class="score-chip s6">6.0</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s5">5</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td><span class="score-chip s6">6</span></td>
+          <td class="comp-highlight">Consumer-grade UX applied to enterprise. Clear self-serve trial path. Strong CX/support positioning.</td>
+          <td class="comp-watch">Platform breadth limited outside CX. AI narrative not enterprise-grade yet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box reveal mt-24">
+    <strong>Key Takeaway:</strong> The gap between ServiceNow (5.1) and Salesforce (8.0) is not primarily a visual design gap — it's a <strong>strategy and content architecture gap</strong>. Salesforce earns its score through disciplined narrative hierarchy, role-based navigation, embedded proof points, and a low-friction demo path. All of these are achievable for ServiceNow without a full platform redesign.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TAB 4 — AI / LLM BENCHMARKS
+═══════════════════════════════════════════ -->
+<section id="ai-benchmarks" class="section">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Aspirational References</div>
+    <h2>AI / LLM Company Website Benchmarks</h2>
+    <p>These are not direct competitors — they're the benchmarks for AI product marketing clarity, digital experience craft, and design confidence. What can servicenow.com learn from each?</p>
+  </div>
+
+  <div class="comp-table-wrap reveal">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Score</th>
+          <th>VP Clarity</th>
+          <th>IA / Nav</th>
+          <th>Conversion</th>
+          <th>Visual Craft</th>
+          <th>What ServiceNow Should Steal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="comp-name">OpenAI</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s9">9.5</span></td>
+          <td><span class="score-chip s10">10</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td class="comp-highlight">Radical simplicity: one message, one product, one CTA. The homepage gets you into the product in under 10 seconds. Zero jargon, zero explanation required. <strong>The antithesis of enterprise complexity — done deliberately and convincingly.</strong> ServiceNow can apply the principle (one primary message, one primary CTA) even if not the exact model.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Anthropic</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s8">8.5</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td class="comp-highlight">Leads with AI safety and trust — not features. Demonstrates that governance and responsibility can be a primary differentiator rather than a footnote. <strong>Directly relevant for ServiceNow's regulated-industry enterprise buyers</strong> (healthcare, financial services, government). Audience segmentation (Developers vs. Business) is clean and instructive.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Google DeepMind / Google Cloud</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s8">8.0</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td class="comp-highlight">Best-in-class developer sandbox experience. <strong>AI Studio, free Vertex credits, Colab integration — technical evaluators can build before they buy.</strong> ServiceNow has no equivalent on-ramp for its Creator Workflows or developer ecosystem. Research credibility is woven into the product narrative, not siloed in an "About" section.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Perplexity</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s8">8.0</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s7">7</span></td>
+          <td class="comp-highlight">New model for collapsing the awareness-to-trial gap. <strong>The product IS the onboarding — zero friction, zero explanation required.</strong> Frictionless entry is a transferable principle: ServiceNow should have at least one product experience that requires no form, no login, and no sales touchpoint to access.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Notion</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s8">8.5</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td class="comp-highlight">Best-in-class B2B SaaS product marketing for a horizontal platform — very close to ServiceNow's challenge. <strong>Use-case-first navigation ("For teams," "For startups"), template-led onboarding, and social proof at every scroll depth.</strong> ServiceNow should study Notion's IA closely — same breadth problem, solved elegantly.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Linear</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s9">9.0</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s10">10</span></td>
+          <td class="comp-highlight"><strong>Design and craft benchmark.</strong> Exceptional typographic hierarchy, purposeful motion design, and product screenshot integration. Minimal but deeply confident. ServiceNow's dark design aesthetic is directionally right — Linear shows what happens when that direction is executed with complete craft discipline.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Stripe</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s9">9.0</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td class="comp-highlight">Enduring benchmark for complex technical products made approachable through design. <strong>Developer documentation as trust-building; product demos embedded in marketing pages; every section earns its length.</strong> Stripe proves that complexity can feel premium rather than overwhelming.</td>
+        </tr>
+        <tr>
+          <td><span class="comp-name">Vercel / Cursor</span> <span class="comp-category aspirational">Aspirational</span></td>
+          <td><span class="score-chip s8">8.5</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s8">8</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td><span class="score-chip s9">9</span></td>
+          <td class="comp-highlight">AI coding tool marketing done with precision. <strong>Technical credibility without jargon overload. Speed and craft as brand values expressed through the experience itself — not described in copy.</strong> Applicable to ServiceNow's positioning of Now Assist as a productivity multiplier for enterprise teams.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box reveal mt-24">
+    <strong>Synthesis:</strong> The recurring pattern across all high-scoring AI/LLM sites is <strong>show, don't describe</strong>. Each one gets users into a product experience — a demo, a sandbox, a template — within seconds of arrival. ServiceNow currently describes its AI capabilities extensively but shows almost none of them. This is the highest-leverage change available without a full site redesign.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TAB 5 — ROADMAP
+═══════════════════════════════════════════ -->
+<section id="roadmap" class="section">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Strategic Roadmap</div>
+    <h2>Now / Next / Later</h2>
+    <p>Sequenced by impact and organizational feasibility. "Now" items require no platform change and should begin in the current quarter.</p>
+  </div>
+
+  <div class="horizon-grid reveal">
+    <div class="horizon-card">
+      <div class="horizon-label now"><span class="dot"></span> Now — Q2 2026</div>
+      <div class="horizon-title">Critical Fixes &amp; Foundation</div>
+      <div class="horizon-subtitle">High impact, low lift. No platform change required. Begin immediately.</div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Single primary CTA per page.</strong> Audit every key page and define one primary action. Remove or demote competing CTAs. "Watch Demo" should be the homepage hero CTA.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Surface the 85% Fortune 500 stat at the hero.</strong> Move this claim and Gartner Leader recognition to the top of the homepage — it earns trust before buyers scroll.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Rewrite the hero value proposition.</strong> Replace "Put AI to Work" with a platform statement that names the buyer, the problem, and a measurable outcome. Test 3 variants.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Add inline customer evidence to product pages.</strong> Attach a named customer quote with an outcome stat to each top-level product page. Don't let proof live only in the case study library.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Reduce mega-nav to 4 top-level items max.</strong> Products, Solutions, Customers, Learn. Remove redundancy. Add a "For [Role]" quick-link strip below the nav.</div></div>
+    </div>
+
+    <div class="horizon-card">
+      <div class="horizon-label next"><span class="dot"></span> Next — Q3–Q4 2026</div>
+      <div class="horizon-title">Structural Redesign</div>
+      <div class="horizon-subtitle">Requires content strategy, IA redesign, and design system work. Medium complexity.</div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Introduce persona-based navigation layer.</strong> Build "For CIOs," "For HR Leaders," "For Finance," "For Developers" as primary entry points. Each path surfaces the relevant products, outcomes, and proof — not the full catalog.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Build the unified AI narrative architecture.</strong> Platform → Now Assist → Agentic AI → AI Control Tower as a sequential story. One page. One scroll. Show the product at each layer.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Launch an ungated product tour.</strong> A scripted, interactive demo of Now Assist accessible from the homepage without a form. Even a modal walkthrough significantly improves mid-funnel conversion intent.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Redesign mobile navigation.</strong> Purpose-built mobile nav — not a compressed desktop mega-nav. Maximum 5 primary items, role-based quick links, accessible CTA bar at the bottom of the viewport.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Introduce outcome-first product page template.</strong> Standardize product pages: headline (outcome), 3-line summary, 3 outcome bullets with numbers, one customer stat, one embedded demo, one CTA.</div></div>
+    </div>
+
+    <div class="horizon-card">
+      <div class="horizon-label later"><span class="dot"></span> Later — 2027</div>
+      <div class="horizon-title">Platform-Level Ambition</div>
+      <div class="horizon-subtitle">Longer-horizon investments that differentiate ServiceNow in the market over time.</div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Launch a developer and builder destination.</strong> "Build on ServiceNow" — a dedicated experience with sandbox access, documentation, Creator Workflows showcase, and a community front-door. Competes directly with Google AI Studio and Salesforce Developer Edition.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Dynamic personalization for returning visitors.</strong> Role-specific content modules, industry-tailored proof points, and product paths adapt based on known company/behavior signals. Requires CDP investment but compounds over time.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>Embed live AI Control Tower preview.</strong> Show the actual governance dashboard — real or simulated — on the marketing site. Nothing builds trust with CIOs faster than seeing the control layer that governs enterprise AI.</div></div>
+      <div class="horizon-item"><div class="horizon-item-dot"></div><div class="horizon-item-text"><strong>ROI calculator integrated into product pages.</strong> Industry-specific ROI modeling surfaced at point of consideration. Supports the business case for departmental buyers and shortens the procurement cycle.</div></div>
+    </div>
+  </div>
+
+  <div class="divider reveal"></div>
+
+  <div class="section-header reveal mt-24">
+    <div class="section-eyebrow">Recommendations</div>
+    <h2>Prioritized Recommendation Detail</h2>
+  </div>
+  <div class="rec-list reveal">
+
+    <div class="rec-card">
+      <div>
+        <div class="rec-label">Problem Addressed</div>
+        <div class="rec-value">No clear primary action. Multiple competing CTAs dilute intent and reduce all conversion rates.</div>
+      </div>
+      <div>
+        <div class="rec-label">Recommended Change</div>
+        <div class="rec-value"><strong>Define one primary CTA per page.</strong> Homepage: "Watch Demo." Product pages: "See It in Action." Remove all secondary CTAs except one soft option (Download Brief).</div>
+      </div>
+      <div>
+        <div class="rec-label">Expected Benefit</div>
+        <div class="rec-value">Demo request conversion rate increase of 15–30% (est., based on Unbounce B2B CTA research, 2025). Reduced bounce on product pages.</div>
+      </div>
+      <div><span class="impact-badge critical">Critical</span></div>
+    </div>
+
+    <div class="rec-card">
+      <div>
+        <div class="rec-label">Problem Addressed</div>
+        <div class="rec-value">"Put AI to Work" is too vague to move enterprise buyers. No specificity on who it's for or what it delivers.</div>
+      </div>
+      <div>
+        <div class="rec-label">Recommended Change</div>
+        <div class="rec-value"><strong>Rewrite hero value proposition.</strong> Introduce a specific outcome-anchor: "The AI Platform Trusted by 85% of the Fortune 500 to Automate IT, HR, Finance, and CX at Scale." A/B test 3 variants.</div>
+      </div>
+      <div>
+        <div class="rec-label">Expected Benefit</div>
+        <div class="rec-value">Improved time-on-site and scroll depth from enterprise decision-maker audiences. Better alignment with Gartner search intent patterns.</div>
+      </div>
+      <div><span class="impact-badge critical">Critical</span></div>
+    </div>
+
+    <div class="rec-card">
+      <div>
+        <div class="rec-label">Problem Addressed</div>
+        <div class="rec-value">Navigation is organized around ServiceNow's product taxonomy, not buyer problem frames.</div>
+      </div>
+      <div>
+        <div class="rec-label">Recommended Change</div>
+        <div class="rec-value"><strong>Add role-based navigation layer.</strong> A secondary nav strip ("For IT", "For HR", "For Finance", "For Developers") that routes to persona-specific pages with curated products, proof, and CTAs.</div>
+      </div>
+      <div>
+        <div class="rec-label">Expected Benefit</div>
+        <div class="rec-value">Reduction in bounce from key buyer personas. Improved funnel progression from awareness to product pages. Direct Salesforce competitive parity.</div>
+      </div>
+      <div><span class="impact-badge high">High</span></div>
+    </div>
+
+    <div class="rec-card">
+      <div>
+        <div class="rec-label">Problem Addressed</div>
+        <div class="rec-value">AI value story is described, not demonstrated. No ungated product experience.</div>
+      </div>
+      <div>
+        <div class="rec-label">Recommended Change</div>
+        <div class="rec-value"><strong>Launch an interactive Now Assist demo module.</strong> Accessible from homepage hero — no form, no login. A guided 3-screen walkthrough of AI in action across IT, HR, and Finance workflows.</div>
+      </div>
+      <div>
+        <div class="rec-label">Expected Benefit</div>
+        <div class="rec-value">Significant improvement in mid-funnel engagement. Closes experience gap with Google AI Studio and Salesforce's Agentforce demo. Builds confidence before sales conversation.</div>
+      </div>
+      <div><span class="impact-badge high">High</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TAB 6 — QUICK WINS
+═══════════════════════════════════════════ -->
+<section id="quickwins" class="section">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Immediate Actions</div>
+    <h2>Quick Wins — High Impact, Low Lift</h2>
+    <p>These can be implemented without a platform redesign. Each should take 1–4 weeks of design and content work.</p>
+  </div>
+
+  <div class="qw-table-wrap reveal">
+    <table class="qw-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Rationale</th>
+          <th>Owner</th>
+          <th>Timeline</th>
+          <th>Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Elevate "85% of Fortune 500" stat to homepage hero, above the fold</td>
+          <td>Currently buried. This is ServiceNow's most powerful social proof claim — it should be the first thing an enterprise buyer reads. Salesforce anchors its homepage with equivalent social proof at the hero.</td>
+          <td>Content / Design</td>
+          <td>1 week</td>
+          <td><span class="sev-badge critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Set "Watch Demo" as the single primary CTA on the homepage hero</td>
+          <td>Removes CTA competition. Moves high-intent buyers to the highest-value mid-funnel action. Based on Unbounce 2025 research, single focused CTAs outperform competing CTAs by 28%+ on B2B pages.</td>
+          <td>Design / Conversion</td>
+          <td>1 week</td>
+          <td><span class="sev-badge critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Add a named customer quote + outcome stat to each top-5 product pages</td>
+          <td>Inline proof at the point of product consideration. Not in a case study carousel — embedded in the product narrative, immediately adjacent to the capability being described.</td>
+          <td>Content Strategy</td>
+          <td>2 weeks</td>
+          <td><span class="sev-badge high">High</span></td>
+        </tr>
+        <tr>
+          <td>Add Gartner Leader badge to homepage hero section</td>
+          <td>ServiceNow is a recognized Leader in multiple Gartner Magic Quadrants. This analyst validation is a top trust signal for enterprise procurement teams. It belongs at the hero, not the footer.</td>
+          <td>Brand / Design</td>
+          <td>1 week</td>
+          <td><span class="sev-badge high">High</span></td>
+        </tr>
+        <tr>
+          <td>Rewrite hero headline with outcome specificity</td>
+          <td>Replace "Put AI to Work" with a statement that names the buyer, the scale, and the outcome. Test: "The AI Platform for Enterprise IT, HR, and Finance — Trusted by 85% of the Fortune 500." Run A/B test over 4 weeks.</td>
+          <td>Content / Strategy</td>
+          <td>1–2 weeks</td>
+          <td><span class="sev-badge critical">Critical</span></td>
+        </tr>
+        <tr>
+          <td>Add role-based quick links below the main hero ("For IT Leaders", "For HR", "For Finance", "For Developers")</td>
+          <td>Lowest-effort version of role-based navigation. Simple link strip that routes to persona-specific landing pages. Immediately signals relevance without requiring a full IA overhaul.</td>
+          <td>Design / Content</td>
+          <td>2–3 weeks</td>
+          <td><span class="sev-badge high">High</span></td>
+        </tr>
+        <tr>
+          <td>Create a unified AI products page showing Now Assist → Agentic AI → AI Control Tower as a sequential narrative</td>
+          <td>Currently, these AI products exist as separate pages without a connecting story. One editorial page that walks through the AI stack — with product screenshots at each layer — closes the narrative gap and gives buyers a clear mental model.</td>
+          <td>Content / Design</td>
+          <td>3–4 weeks</td>
+          <td><span class="sev-badge high">High</span></td>
+        </tr>
+        <tr>
+          <td>Reduce homepage animation weight — remove or simplify decorative motion</td>
+          <td>Heavy animation is a page performance liability without proportional communication value. Remove or simplify decorative motion to improve LCP (Largest Contentful Paint) and mobile performance. Performance is a trust signal for enterprise technical evaluators.</td>
+          <td>Engineering / Design</td>
+          <td>2 weeks</td>
+          <td><span class="sev-badge medium">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box reveal mt-24">
+    <strong>Prioritization note:</strong> The first three items (hero stat, primary CTA, and inline proof) require the least effort and have the highest probability of moving demo request rates within 30 days. These should be treated as week-1 work, not backlog items.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TAB 7 — METRICS
+═══════════════════════════════════════════ -->
+<section id="metrics" class="section">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Measurement Framework</div>
+    <h2>Key Metrics to Monitor</h2>
+    <p>Establish baselines before implementing any changes. Review cadence: 30-day check-in after each Now initiative, 60-day review after structural changes, 90-day strategic assessment.</p>
+  </div>
+
+  <div class="insight-box reveal">
+    <strong>Baseline first:</strong> None of these metrics are useful without a pre-change baseline. Instrument recommends establishing current-state benchmarks across all primary metrics before any content or design work goes live. This requires access to ServiceNow's GA4 / analytics account and ideally Hotjar or equivalent behavioral data.
+  </div>
+
+  <div class="metrics-table-wrap reveal mt-24">
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>What It Measures</th>
+          <th>Target / Benchmark</th>
+          <th>Review Cadence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Demo Request Rate</strong></td>
+          <td>% of homepage visitors who initiate a demo request. Primary conversion KPI for enterprise B2B.</td>
+          <td>Enterprise SaaS median: 2–4%. Target: move to 3%+ from current baseline within 90 days of CTA change.</td>
+          <td>Weekly, with 30-day rolling avg</td>
+        </tr>
+        <tr>
+          <td><strong>Bounce Rate by Persona Segment</strong></td>
+          <td>% of visitors who leave without a second pageview. Segmented by industry and company size from GA4.</td>
+          <td>Enterprise SaaS median: 45–55%. Target: reduce by 8–12 percentage points post-IA change.</td>
+          <td>Monthly, post-nav change</td>
+        </tr>
+        <tr>
+          <td><strong>Time on Site (Enterprise Visitors)</strong></td>
+          <td>Depth of engagement from identified enterprise IP ranges. Indicates content resonance.</td>
+          <td>Baseline first. Target 15%+ increase post-content redesign. Benchmark: 3–5 mins for high-quality B2B visitors.</td>
+          <td>Monthly</td>
+        </tr>
+        <tr>
+          <td><strong>Scroll Depth — Homepage Hero</strong></td>
+          <td>% of visitors who scroll past the hero section. Indicator of initial message resonance.</td>
+          <td>Target 70%+ scroll depth past hero. Low scroll = value proposition is not landing.</td>
+          <td>Bi-weekly, via Hotjar or equivalent</td>
+        </tr>
+        <tr>
+          <td><strong>Demo-to-MQL Conversion Rate</strong></td>
+          <td>% of demo viewers who progress to Marketing Qualified Lead status. Measures demo quality.</td>
+          <td>Requires baseline. Goal: improve by 10–20% within 60 days of demo content improvement.</td>
+          <td>Monthly</td>
+        </tr>
+        <tr>
+          <td><strong>Product Page Engagement Rate</strong></td>
+          <td>Engaged sessions on key product pages (Now Assist, AI Platform, top workflows). Proxy for buyer consideration.</td>
+          <td>Target 40%+ engaged session rate. Benchmark post-outcome-first page template rewrite.</td>
+          <td>Monthly</td>
+        </tr>
+        <tr>
+          <td><strong>CTA Click-Through Rate (Primary vs. Secondary)</strong></td>
+          <td>Ratio of clicks on primary vs. secondary CTAs. Monitors whether CTA hierarchy is working.</td>
+          <td>Target 70/30 primary/secondary split after single-CTA implementation. Currently likely closer to 40/60.</td>
+          <td>Bi-weekly</td>
+        </tr>
+        <tr>
+          <td><strong>Mobile Bounce Rate</strong></td>
+          <td>Bounce rate specifically from mobile devices. Current mobile UX is a known friction point.</td>
+          <td>Target below 55% mobile bounce. Enterprise buyers use mobile for initial research — a high mobile bounce represents top-funnel leakage.</td>
+          <td>Monthly</td>
+        </tr>
+        <tr>
+          <td><strong>Organic Search Impression Share (AI Terms)</strong></td>
+          <td>Share of voice on key AI enterprise queries: "enterprise AI platform," "agentic AI for enterprise," "AI workflow automation." Tracks SEO impact of content changes.</td>
+          <td>Establish current share via Google Search Console. Target 15% growth in impression share within 6 months of content refresh.</td>
+          <td>Quarterly</td>
+        </tr>
+        <tr>
+          <td><strong>Page Load Time (LCP) — Homepage</strong></td>
+          <td>Largest Contentful Paint score on desktop and mobile. Performance is a trust signal and affects bounce rate.</td>
+          <td>Target LCP under 2.5s (Google "Good" threshold). Current animation-heavy implementation likely 3–5s on mobile.</td>
+          <td>Monthly, via Core Web Vitals</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card reveal mt-24">
+    <div style="font-weight:700; font-size:15px; margin-bottom:16px;">Risks &amp; Assumptions</div>
+    <div class="finding-item">
+      <div class="finding-dot" style="background:var(--sn-high)"></div>
+      <div class="finding-text"><strong>Internal org alignment may slow content changes.</strong> Enterprise software companies often have complex review processes for external messaging. Quick wins could stall without clear ownership and executive sponsorship for the site redesign initiative.</div>
+    </div>
+    <div class="finding-item">
+      <div class="finding-dot" style="background:var(--sn-high)"></div>
+      <div class="finding-text"><strong>This audit is based on publicly available site research and industry analysis.</strong> Findings should be validated against ServiceNow's actual analytics data (GA4, Hotjar, Salesforce CRM funnel data) before prioritization is finalized. Internal user research with actual buyers is strongly recommended.</div>
+    </div>
+    <div class="finding-item">
+      <div class="finding-dot" style="background:var(--sn-medium)"></div>
+      <div class="finding-text"><strong>Competitive landscape is moving quickly.</strong> Salesforce and Microsoft are actively investing in their AI marketing presence. A 6-month implementation cycle on Now items carries the risk that the competitive gap widens before improvements ship.</div>
+    </div>
+    <div class="finding-item">
+      <div class="finding-dot" style="background:var(--sn-medium)"></div>
+      <div class="finding-text"><strong>Demo path feasibility depends on product org partnership.</strong> The recommended interactive demo module requires coordination between marketing, product, and engineering. If a live product demo is not feasible, a high-quality scripted walkthrough is an acceptable interim solution.</div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+</main>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">Instrument — Portland, OR</div>
+      <div class="footer-note">ServiceNow UX &amp; Experience Audit — April 2026 — Confidential Client Work Product</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── Tab Navigation ───
+  function showTab(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const idx = ['overview','findings','competitors','ai-benchmarks','roadmap','quickwins','metrics'].indexOf(id);
+    document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+    const xNav = document.querySelector('.x-nav');
+    const xNavH = xNav ? xNav.offsetHeight : 44;
+    window.scrollTo({ top: document.querySelector('.nav-tabs').offsetTop - xNavH, behavior: 'smooth' });
+    initDimBars();
+  }
+
+  // ─── Dimension Expand/Collapse ───
+  function toggleDim(el) {
+    const isExpanded = el.classList.contains('expanded');
+    document.querySelectorAll('.dimension-item').forEach(d => d.classList.remove('expanded'));
+    if (!isExpanded) el.classList.add('expanded');
+  }
+
+  // ─── Scroll Reveal ───
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  // ─── Animate dim bars on visibility ───
+  function initDimBars() {
+    setTimeout(() => {
+      document.querySelectorAll('.dim-bar-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = w; }, 50);
+      });
+    }, 100);
+  }
+  initDimBars();
+
+  // ─── Radar Chart ───
+  const radarCtx = document.getElementById('radarChart').getContext('2d');
+  new Chart(radarCtx, {
+    type: 'radar',
+    data: {
+      labels: [
+        'Value Prop', 'Nav / IA', 'AI Narrative', 'Conversion',
+        'Content', 'Visual Design', 'Trust / Proof', 'Mobile', 'Performance', 'Dev / Builder'
+      ],
+      datasets: [
+        {
+          label: 'ServiceNow',
+          data: [5, 5, 4.5, 4, 5.5, 6, 6, 5, 5, 4],
+          backgroundColor: 'rgba(98,216,78,0.15)',
+          borderColor: '#62D84E',
+          borderWidth: 2,
+          pointBackgroundColor: '#62D84E',
+          pointRadius: 4,
+        },
+        {
+          label: 'Salesforce (Benchmark)',
+          data: [9, 8, 9, 8, 8, 8, 9, 8, 8, 7],
+          backgroundColor: 'rgba(0,199,177,0.08)',
+          borderColor: 'rgba(0,199,177,0.6)',
+          borderWidth: 2,
+          borderDash: [5,4],
+          pointBackgroundColor: 'rgba(0,199,177,0.8)',
+          pointRadius: 3,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 10,
+          ticks: {
+            stepSize: 2,
+            color: '#475569',
+            font: { size: 10, family: 'Inter' },
+            backdropColor: 'transparent'
+          },
+          grid: { color: 'rgba(30,47,68,0.9)' },
+          angleLines: { color: 'rgba(30,47,68,0.9)' },
+          pointLabels: {
+            color: '#94A3B8',
+            font: { size: 11, family: 'Inter', weight: '500' }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#94A3B8',
+            font: { size: 12, family: 'Inter' },
+            boxWidth: 12,
+            boxHeight: 12
+          }
+        },
+        tooltip: {
+          backgroundColor: '#162030',
+          borderColor: '#1E2F44',
+          borderWidth: 1,
+          titleColor: '#F8FAFC',
+          bodyColor: '#94A3B8',
+          titleFont: { family: 'Inter', weight: '600' },
+          bodyFont: { family: 'Inter' },
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
